@@ -1,0 +1,10 @@
+{
+   "name": "fridge witch ❄",
+   "description": "avatar for second avatar contest",
+   "color": "#84ebff",
+   "badge_color_donator": "#84ebff",
+   "authors": [
+      "AuriaFoxGirl"
+   ],
+   "autoScripts": ["main"]
+}
