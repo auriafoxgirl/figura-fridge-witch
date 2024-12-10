@@ -1,7 +1,7 @@
 local model = fridgeModel.door
 local rot = 0
 local oldRot = 0
-local vel = 10 * 0
+local vel = 10
 local closed = true
 
 function events.tick()

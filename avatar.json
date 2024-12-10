@@ -6,5 +6,10 @@
    "authors": [
       "AuriaFoxGirl"
    ],
-   "autoScripts": ["main"]
+   "autoScripts": ["main"],
+   "customizations": {
+      "fridge.items": {
+         "visible": false
+      }
+   }
 }
