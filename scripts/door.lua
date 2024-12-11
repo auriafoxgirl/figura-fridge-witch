@@ -14,8 +14,8 @@ function events.tick()
    vel = vel - playerVel.z * 10 + playerVel.x * 10
 
    rot = rot + vel
-   if rot > 100 then
-      rot = 100
+   if rot > 120 then
+      rot = 120
       vel = math.abs(vel) * -0.2
    elseif rot < 0 then
       if not closed and not renderer:isFirstPerson() then
