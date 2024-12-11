@@ -23,7 +23,7 @@ function pings.sync(...)
    end
    local tbl = {...}
    local i = 0
-   for _, name in pairs(registered) do
+   for _, name in pairs(names) do
       i = i + 1
       registered[name].set(tbl[i])
    end
@@ -34,10 +34,12 @@ if not host:isHost() then
 end
 
 function events.tick()
-   if time % 100 == 0 then
+   if time % 100 == 1 then
       local tbl = {}
+      local i = 0
       for _, name in pairs(names) do
-         table.insert(tbl, registered[name].get())
+         i = i + 1
+         tbl[i] = registered[name].get()
       end
       pings.sync(table.unpack(tbl))
    end
