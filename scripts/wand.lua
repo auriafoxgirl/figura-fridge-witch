@@ -17,17 +17,18 @@ wandToggleKey.press = function()
    if wandEnabled then
       wandEnabled = false
       fancyPrint('Wand disabled')
-      return
+      return true
    end
    if not player:isLoaded() then
-      return
+      return true
    end
    if player:getItem(1).id ~= 'minecraft:air' then
       fancyPrint("Couldn't enable wand, make sure you are not holding any item")
-      return
+      return true
    end
    wandEnabled = true
    fancyPrint('Wand enable')
+   return true
 end
 
 local function isWandEnabled()
