@@ -1,9 +1,17 @@
 vanilla_model.ALL:visible(false)
+vanilla_model.HELD_ITEMS:visible(true)
 
 -- global variables
 fridgeModel = models.fridge.fridge
 time = 0
 itemModels = {} ---@type {[string]: ModelPart}
+
+function fancyPrint(text)
+   printJson(toJson{
+      text = '❄ '..text..'\n',
+      color = '#84ebff'
+   })
+end
 
 -- configure stuff
 fridgeModel:setPrimaryRenderType('CUTOUT_CULL')

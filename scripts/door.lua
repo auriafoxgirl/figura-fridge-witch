@@ -17,9 +17,9 @@ function events.tick()
    if rot > 120 then
       rot = 120
       vel = math.abs(vel) * -0.2
-   elseif rot < 0 then
+   elseif rot < -3 then
       if not closed and not renderer:isFirstPerson() then
-         local volume = math.min(math.abs(vel) * 0.05, 1)
+         local volume = math.min(math.abs(vel) * 0.05 + 0.05, 1)
          sounds['block.iron_door.close']
             :pos(player:getPos())
             :volume(volume)
@@ -27,14 +27,24 @@ function events.tick()
             :play()
       end
       closed = true
-      rot = 0
+      rot = -3
       vel = vel * 0.2
    end
-   if rot > 5 then
+   if rot > 3 then
+      if closed and not renderer:isFirstPerson() then
+         local volume = math.min(math.abs(vel) * 0.05 + 0.05, 1)
+         sounds['block.iron_door.open']
+         :pos(player:getPos())
+         :volume(volume)
+         :pitch(1.1)
+         :play()
+      end
       closed = false
    end
 end
 
 function events.render(delta)
-   model:setRot(0, math.lerp(oldRot, rot, delta), 0)
+   local doorRot = math.lerp(oldRot, rot, delta)
+   doorRot = math.max(doorRot, 0)
+   model:setRot(0, doorRot, 0)
 end
