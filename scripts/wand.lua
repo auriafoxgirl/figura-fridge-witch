@@ -5,17 +5,31 @@ wandModelOrginal:setPos(32, 0, 0)
    :setSecondaryRenderType('GLINT')
 wandModelOrginal:moveTo(wandModel)
 
+local sync = require('scripts.sync')
+
 local pos = vec(0, 0, 0)
 local oldPos = vec(0, 0, 0)
 local targetPos = vec(0, 0, 0)
 local rot = vec(0, 0, 0)
 local oldRot = vec(0, 0, 0)
 local wandEnabled = false
+local oldPlayerRot
+local playerRot
+
+function pings.toggleWand(state)
+   wandEnabled = state
+end
+
+sync.register('wand', function()
+   return wandEnabled
+end, function(state)
+   wandEnabled = state
+end)
 
 local wandToggleKey = keybinds:fromVanilla('figura.config.action_wheel_button')
 wandToggleKey.press = function()
    if wandEnabled then
-      wandEnabled = false
+      pings.toggleWand(false)
       fancyPrint('Wand disabled')
       return true
    end
@@ -26,8 +40,8 @@ wandToggleKey.press = function()
       fancyPrint("Couldn't enable wand, make sure you are not holding any item")
       return true
    end
-   wandEnabled = true
    fancyPrint('Wand enable')
+   pings.toggleWand(true)
    return true
 end
 
@@ -46,10 +60,18 @@ local function randomVector()
    ) * 2 - 1
 end
 
+function events.entity_init()
+   playerRot = player:getRot()
+   oldPlayerRot = playerRot
+end
+
 function events.tick()
    if not isWandEnabled() then
       return
    end
+   oldPlayerRot = playerRot
+   playerRot = math.lerpAngle(oldPlayerRot, player:getRot(), 0.5)
+
    oldPos = pos
    pos = math.lerp(pos, targetPos, 0.4)
    oldRot = rot
@@ -73,27 +95,28 @@ local function updateModel(delta)
       wandModel:visible(false)
       return
    end
-   local wandPos = math.lerp(oldPos, pos, delta) + vec(0, 24, -16)
+   local wandPos = math.lerp(oldPos, pos, delta)
    local wandRot = math.lerp(oldRot, rot, delta)
+   local mat = matrices.mat4()
    if renderer:isFirstPerson() then
       wandModel:setParentType('World')
-      local rot = player:getRot(delta)
-      local eyeHeight = player:getEyeHeight() * 16
-      wandPos.z = wandPos.z + 6
-      wandPos.x = wandPos.x + (player:isLeftHanded() and -1 or 1) * 16
-      wandPos.y = wandPos.y - eyeHeight
-      wandPos = wandPos * matrices.xRotation3(-rot.x) * matrices.yRotation3(180 - rot.y)
-      wandPos.y = wandPos.y + eyeHeight - 4
-      wandPos = wandPos + player:getPos(delta) * 16
-      wandRot.y = wandRot.y - rot.y + 180
-      wandRot.x = wandRot.x - rot.x + 30
+   
+      local rot = math.lerpAngle(math.lerpAngle(oldPlayerRot, playerRot, delta), player:getRot(), 0.8)
+
+      wandPos.x = wandPos.x + (player:isLeftHanded() and -1 or 1) * 10
+      mat:translate(wandPos + vec(0, -12, -2))
+      
+      mat:rotateX(30 - rot.x)
+      mat:rotateY(180 - rot.y)
+      
+      mat:translate(client.getCameraPos() * 16)
    else
-      wandPos.x = wandPos.x + 6
-      wandPos.y = wandPos.y - 2
+      wandPos = wandPos + vec(6, 22, -16)
+      mat:rotate(wandRot)
+      mat:translate(wandPos)
       wandModel:setParentType('None')
    end
-   wandModel:pos(wandPos)
-   wandModel:rot(wandRot)
+   wandModel:setMatrix(mat)
    wandModel:visible(true)
 end
 
