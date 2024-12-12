@@ -6,6 +6,7 @@ wandModelOrginal:setPos(32, 0, 0)
 wandModelOrginal:moveTo(wandModel)
 
 local sync = require('scripts.sync')
+require('scripts.sendChatMessages')
 
 local pos = vec(0, 0, 0)
 local oldPos = vec(0, 0, 0)
@@ -44,8 +45,23 @@ wandToggleKey.press = function()
       fancyPrint("Couldn't enable wand, make sure you are not holding any item")
       return true
    end
-   fancyPrint('Wand enable')
+   fancyPrint('Wand enabled')
    pings.toggleWand(true)
+   if player:getPermissionLevel() >= 2 then
+      sendChatMessages(function(state)
+         if not state then
+            fancyPrint{
+               'Figura Setting "',
+               {translate = "figura.config.chat_messages"},
+               '" is disabled'
+            }
+            fancyPrint("some wand features will be limited")
+         end
+      end)
+   else
+      fancyPrint("You don't have command permissions on this server")
+      fancyPrint("some wand features will be limited")
+   end
    return true
 end
 
@@ -134,3 +150,5 @@ wandModel.preRender = function(delta)
    end
    updateModel(delta)
 end
+
+return isWandEnabled

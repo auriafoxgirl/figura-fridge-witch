@@ -11,10 +11,16 @@ fridgeModel = models.fridge.fridge
 time = 0
 itemModels = {} ---@type {[string]: ModelPart}
 
+---prints pretty, cold text
+---@param text string|table
 function fancyPrint(text)
    printJson(toJson{
-      text = '❄ '..text..'\n',
-      color = '#84ebff'
+      {
+         text = '❄ ',
+         color = '#84ebff',
+         extra = {text},
+      },
+      '\n'
    })
 end
 
