@@ -1,6 +1,11 @@
 vanilla_model.ALL:visible(false)
 vanilla_model.HELD_ITEMS:visible(true)
 
+-- read only metatables
+for _, v in pairs(figuraMetatables) do
+   v.__metatable = false
+end
+
 -- global variables
 fridgeModel = models.fridge.fridge
 time = 0
@@ -12,6 +17,9 @@ function fancyPrint(text)
       color = '#84ebff'
    })
 end
+
+-- avatar vars
+avatar:store("patpat.boundingBox", vec(1, 2, 1))
 
 -- configure stuff
 fridgeModel:setPrimaryRenderType('CUTOUT_CULL')

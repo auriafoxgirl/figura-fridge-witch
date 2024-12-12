@@ -26,8 +26,12 @@ end, function(state)
    wandEnabled = state
 end)
 
+local f3Key = keybinds:newKeybind('f3 no override', 'key.keyboard.f3')
 local wandToggleKey = keybinds:fromVanilla('figura.config.action_wheel_button')
 wandToggleKey.press = function()
+   if f3Key:isPressed() then
+      return
+   end
    if wandEnabled then
       pings.toggleWand(false)
       fancyPrint('Wand disabled')
