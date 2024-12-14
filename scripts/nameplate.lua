@@ -4,6 +4,8 @@
 ---@return table
 local function formatText(str, startColor)
    local json = toJson({{text = str, color = startColor}})
+   json = json:gsub('${bold}', '"},{"bold":true,"text":"')
+   json = json:gsub('${unbold}', '"},{"bold":false,"text":"')
    json = json:gsub('${(.-)}', '"},{"color":"%1","text":"')
    return parseJson(json)
 end
@@ -19,10 +21,10 @@ nameplate.ALL:setText(toJson{
          formatText([[
 
 ┌──┐
-││    │     ${#84ebff}Made by${#4769d7}:${#ffffff}
-││    │     ${#84ebff}AuriaFoxGirl${#ffffff}
+││${bold}   ${unbold}│     ${#84ebff}Made by${#4769d7}:${#ffffff}
+││${bold}   ${unbold}│     ${#84ebff}AuriaFoxGirl${#ffffff}
 ├──┤
-││    │
+││${bold}   ${unbold}│
 └──┘]])
       }},
    },
