@@ -5,6 +5,8 @@ wandModelOrginal:setPos(32, 0, 0)
    :setSecondaryRenderType('GLINT')
 wandModelOrginal:moveTo(wandModel)
 
+local mod = {}
+
 local sync = require('scripts.sync')
 require('scripts.sendChatMessages')
 
@@ -27,23 +29,15 @@ end, function(state)
    wandEnabled = state
 end)
 
-local f3Key = keybinds:newKeybind('f3 no override', 'key.keyboard.f3')
-local wandToggleKey = keybinds:fromVanilla('figura.config.action_wheel_button')
-wandToggleKey.press = function()
-   if f3Key:isPressed() then
-      return
-   end
+function mod.toggle()
    if wandEnabled then
       pings.toggleWand(false)
       fancyPrint('Wand disabled')
-      return true
-   end
-   if not player:isLoaded() then
-      return true
+      return false
    end
    if player:getItem(1).id ~= 'minecraft:air' then
       fancyPrint("Couldn't enable wand, make sure you are not holding any item")
-      return true
+      return false
    end
    fancyPrint('Wand enabled')
    pings.toggleWand(true)
@@ -62,10 +56,12 @@ wandToggleKey.press = function()
       fancyPrint("You don't have command permissions on this server")
       fancyPrint("some wand features will be limited")
    end
+   playerRot = player:getRot() + vec(50, 0)
+   oldPlayerRot = playerRot
    return true
 end
 
-local function isWandEnabled()
+function mod.getEnabled()
    if player:getItem(1).id ~= 'minecraft:air' then
       return false
    end
@@ -86,7 +82,7 @@ function events.entity_init()
 end
 
 function events.tick()
-   if not isWandEnabled() then
+   if not mod.getEnabled() then
       return
    end
    oldPlayerRot = playerRot
@@ -111,7 +107,7 @@ function events.tick()
 end
 
 local function updateModel(delta)
-   if not isWandEnabled() then
+   if not mod.getEnabled() then
       wandModel:visible(false)
       return
    end
@@ -151,4 +147,4 @@ wandModel.preRender = function(delta)
    updateModel(delta)
 end
 
-return isWandEnabled
+return mod

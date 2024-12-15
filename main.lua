@@ -63,6 +63,23 @@ function events.tick()
    time = time + 1
 end
 
+-- useful functions
+---gets entities
+---@param pos1 Vector3
+---@param pos2 Vector3
+---@param ignoredUuids? {[string]: any}
+---@return Entity[]
+function getEntities(pos1, pos2, ignoredUuids)
+   local entities = {}
+   raycast:entity(pos1, pos2, function(entity)
+      if not ignoredUuids or not ignoredUuids[entity:getUUID()] then
+         table.insert(entities, entity)
+      end
+      return false
+   end)
+   return entities
+end
+
 -- load everything
 for _, v in pairs(listFiles('', true)) do
    if v ~= 'main' then

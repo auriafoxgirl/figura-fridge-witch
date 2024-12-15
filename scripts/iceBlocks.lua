@@ -49,12 +49,17 @@ end
 function mod.iceEntity(entity, time)
    local size = getBoundingBox(entity)
    size = size + 6 / 16
-   table.insert(iceBlocks, {
+   local id = entity:getUUID()
+   if iceBlocks[id] then
+      iceBlocks[id].time = time
+      return
+   end
+   iceBlocks[id] = {
       time = time,
       entity = entity,
       model = makeIceModel(size),
       size = size
-   })
+   }
 end
 
 function events.tick()
