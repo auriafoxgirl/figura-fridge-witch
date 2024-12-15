@@ -8,6 +8,8 @@ for _, v in pairs(iceModelTemplate:getChildren()) do
    v:setSecondaryRenderType('NONE')
 end
 
+local particleEffects = require('scripts.particleEffects')
+
 local function makeIceModel(size)
    local model = iceWorld:newPart('')
    model:addChild(iceModelTemplate.x:copy(''):setUVMatrix(matrices.scale3(size.x, size.y, 1)))
@@ -38,6 +40,7 @@ end
 ---@param pos2 Vector3
 ---@param time number
 function mod.iceRegion(pos1, pos2, time)
+   error('unfinished, borken')
    table.insert(iceBlocks, {
       time = time
    })
@@ -48,8 +51,10 @@ end
 ---@param time number
 function mod.iceEntity(entity, time)
    local size = getBoundingBox(entity)
-   size = size + 6 / 16
+   size = size + vec(6, 3, 6) / 16
    local id = entity:getUUID()
+   local entityPos = entity:getPos()
+   particleEffects.box(entityPos - size.x_z * 0.5, entityPos + size * vec(0.5, 1, 0.5))
    if iceBlocks[id] then
       iceBlocks[id].time = time
       return
@@ -67,6 +72,11 @@ function events.tick()
       v.time = v.time - 1
       if v.time < 0 or (v.entity and not v.entity:isLoaded()) then
          v.model:remove()
+         local pos = v.entity and v.entity:getPos() or nil
+         if pos then
+            sounds['minecraft:block.glass.break']:pos(pos):play()
+            particleEffects.boxIce(pos - v.size.x_z * 0.5, pos + v.size * vec(0.5, 1, 0.5))
+         end
          iceBlocks[i] = nil
       end
    end

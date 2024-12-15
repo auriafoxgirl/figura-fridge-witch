@@ -44,6 +44,7 @@ local function setFridgeItems(compressed)
          i = i + 1
          local model = itemsContainer:newPart('')
          model:setPos(itemPositions[i])
+         model:setLight(15, 15)
          if itemModels[item.id] then
             model:addChild(itemModels[item.id])
          else
@@ -51,6 +52,7 @@ local function setFridgeItems(compressed)
                :setItem(item)
                :setDisplayMode('FIXED')
                :rot(0, 180 + math.cos(i * 4) * 20, 0)
+               :light(15, 15)
                :setScale(0.35)
                :setPos(0, 2.5, 0)
          end

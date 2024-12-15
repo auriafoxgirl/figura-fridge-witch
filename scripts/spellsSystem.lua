@@ -62,8 +62,18 @@ local function unpackUuid(uuidSmall)
 end
 
 function pings.castSpell(spellId, entityUuid)
+   if not player:isLoaded() then
+      return
+   end
    local entity = entityUuid and world.getEntity(unpackUuid(entityUuid))
    spells[spellId].run(entity)
+
+   local pos = player:getPos()
+   local subtitle = toJson{text = 'wand sounds', color = '#84ebff'}
+   sounds["minecraft:block.amethyst_block.chime"]:setPitch(0.5):pos(pos):subtitle(subtitle):play()
+   sounds["minecraft:block.amethyst_block.resonate"]:setPitch(0.4):pos(pos):subtitle(subtitle):play()
+   sounds["minecraft:block.amethyst_block.resonate"]:setPitch(0.8):pos(pos):subtitle(subtitle):play()
+   sounds["minecraft:block.large_amethyst_bud.break"]:setPitch(0.8):pos(pos):subtitle(subtitle):play()
 end
 
 local function castSpell(spellId)
@@ -85,7 +95,7 @@ local function castSpell(spellId)
       local ignoredEntities = {[avatar:getUUID()] = true}
       for i = 3, 20 do
          local pos = playerEyePos + i * playerDir
-         local dist = math.min(i * 0.5, 5)
+         local dist = math.min(i * 0.2, 3)
          local entities = getEntities(pos - dist, pos + dist, ignoredEntities)
          if #entities >= 1 then
             entity = entities[1]
@@ -93,6 +103,15 @@ local function castSpell(spellId)
          end
       end
    end
+   if entity then
+      local dist = (playerEyePos - entity:getPos()):length()
+      local _, blockPos = player:getTargetedBlock(true, 20)
+      local blockDist = (playerEyePos - blockPos):length()
+      if dist > blockDist + 1 then
+         entity = nil
+      end
+   end
+
    local entityUuid = entity and packUuid(entity:getUUID())
 
    pings.castSpell(spellId, entityUuid)
