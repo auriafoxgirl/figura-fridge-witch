@@ -65,6 +65,9 @@ function pings.castSpell(spellId, entityUuid)
    if not player:isLoaded() then
       return
    end
+
+   wand.animate()
+
    local entity = entityUuid and world.getEntity(unpackUuid(entityUuid))
    spells[spellId].run(entity)
 

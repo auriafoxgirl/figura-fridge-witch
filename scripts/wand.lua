@@ -15,6 +15,7 @@ local oldPos = vec(0, 0, 0)
 local targetPos = vec(0, 0, 0)
 local rot = vec(0, 0, 0)
 local oldRot = vec(0, 0, 0)
+local targetRot = vec(0, 0, 0)
 local wandEnabled = false
 local oldPlayerRot
 local playerRot
@@ -68,6 +69,11 @@ function mod.getEnabled()
    return wandEnabled
 end
 
+function mod.animate()
+   targetPos = vec(0, -4, -6)
+   targetRot = targetRot * 0.5 + vec(-90, -40, 0)
+end
+
 local function randomVector()
    return vec(
       math.random(),
@@ -91,7 +97,15 @@ function events.tick()
    oldPos = pos
    pos = math.lerp(pos, targetPos, 0.4)
    oldRot = rot
-   rot = math.lerp(rot, vec(pos.y, -pos.x, 0) * 2, 0.4)
+   rot = math.lerp(rot, targetRot, 0.4)
+   -- rot = math.lerp(rot, vec(pos.y, -pos.x, 0) * 2, 0.4)
+
+   targetRot = targetRot * 0.4
+   targetPos = targetPos * 0.4
+
+   if not client.isHudEnabled() then
+      return
+   end
 
    local wandTipPos = wandModelOrginal.wandTip:partToWorldMatrix():apply()
    for _ = 1, 2 do
@@ -119,6 +133,7 @@ local function updateModel(delta)
    
       local rot = math.lerpAngle(math.lerpAngle(oldPlayerRot, playerRot, delta), player:getRot(), 0.8)
 
+      mat:rotate(wandRot)
       wandPos.x = wandPos.x + (player:isLeftHanded() and -1 or 1) * 10
       mat:translate(wandPos + vec(0, -12, -2))
       
@@ -126,14 +141,16 @@ local function updateModel(delta)
       mat:rotateY(180 - rot.y)
       
       mat:translate(client.getCameraPos() * 16)
+
+      wandModel:visible(client.isHudEnabled())
    else
       wandPos = wandPos + vec(6, 22, -16)
       mat:rotate(wandRot)
       mat:translate(wandPos)
       wandModel:setParentType('None')
+      wandModel:visible(true)
    end
    wandModel:setMatrix(mat)
-   wandModel:visible(true)
 end
 
 function events.render(delta)

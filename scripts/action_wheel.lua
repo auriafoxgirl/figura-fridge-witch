@@ -3,7 +3,7 @@ if not host:isHost() then
 end
 
 local wand = require('scripts.wand')
-local spells = require('scripts.spellsSystem')
+local spells = require('scripts.spells_system')
 
 local page = action_wheel:newPage('main')
 action_wheel:setPage(page)
