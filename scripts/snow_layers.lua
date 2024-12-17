@@ -17,12 +17,16 @@ function mod.newLayer(pos, time)
    if #world.getBlockState(pos + vectorUp):getCollisionShape() >= 1 then
       return
    end
+   local collisionShape = world.getBlockState(pos):getCollisionShape()
+   if #collisionShape < 1 then
+      return
+   end
    local model = snowModel:newPart('')
    local modelPivot = model:newPart('')
    local blockLight = world.getBlockLightLevel(pos + vectorUp)
    local skyLight = world.getSkyLightLevel(pos + vectorUp)
    local height = 0
-   for i, aabb in pairs(world.getBlockState(pos):getCollisionShape()) do
+   for i, aabb in pairs(collisionShape) do
       height = math.max(height, aabb[2].y)
       modelPivot:newBlock('a'..i)
          :block('snow')

@@ -103,7 +103,7 @@ function events.tick()
    targetRot = targetRot * 0.4
    targetPos = targetPos * 0.4
 
-   if not client.isHudEnabled() then
+   if not client.isHudEnabled() and renderer:isFirstPerson() then
       return
    end
 
