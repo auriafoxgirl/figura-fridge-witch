@@ -50,14 +50,16 @@ function events.tick()
    snowLayersToRender = {}
    for i, v in pairs(snowLayers) do
       v.time = v.time - 1
-      v.oldScale = v.scale
-      v.targetScale = math.lerp(v.targetScale, v.time > 20 and 1 or 0, 0.1)
-      v.scale = math.lerp(v.scale, v.targetScale, 0.2)
       if v.time < 0 then
          v.model:remove()
          snowLayers[i] = nil
-      elseif v.scale < 0.99 or v.targetScale < 0.99 then
-         snowLayersToRender[i] = v
+      else
+         v.oldScale = v.scale
+         v.targetScale = math.lerp(v.targetScale, v.time > 20 and 1 or 0, 0.1)
+         v.scale = math.lerp(v.scale, v.targetScale, 0.2)
+         if v.scale < 0.99 or v.targetScale < 0.99 then
+            snowLayersToRender[i] = v
+         end
       end
    end
 end
