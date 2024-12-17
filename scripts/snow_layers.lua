@@ -2,8 +2,8 @@ local mod = {}
 local snowModel = models:newPart('snow_layers_world', 'World')
 local snowLayers = {}
 local vectorUp = vec(0, 1, 0)
-local posOffset = vec(0.0005, 0.0005, 0.0005)
-local scaleOffset = vec(-0.001, 1, -0.001)
+local posOffset = vec(-0.0005, 0, -0.0005)
+local scaleOffset = vec(0.001, 1, 0.001)
 
 local snowLayersToRender = {}
 
@@ -19,7 +19,7 @@ function mod.newLayer(pos, time)
    end
    local model = snowModel:newPart('')
    local modelPivot = model:newPart('')
-   local light = world.getLightLevel(pos + vectorUp)
+   local blockLight = world.getBlockLightLevel(pos + vectorUp)
    local skyLight = world.getSkyLightLevel(pos + vectorUp)
    local height = 0
    for i, aabb in pairs(world.getBlockState(pos):getCollisionShape()) do
@@ -28,7 +28,7 @@ function mod.newLayer(pos, time)
          :block('snow')
          :pos((aabb[1].x_z + aabb[2]._y_ + posOffset) * 16)
          :scale(aabb[2].x_z - aabb[1].x_z + scaleOffset)
-         :light(light, skyLight)
+         :light(blockLight, skyLight)
    end
    model:pos(pos * 16)
    model:pivot(0, height * 16, 0)
@@ -43,6 +43,7 @@ function mod.newLayer(pos, time)
 end
 
 function events.tick()
+   snowLayersToRender = {}
    for i, v in pairs(snowLayers) do
       v.time = v.time - 1
       v.oldScale = v.scale
@@ -61,7 +62,6 @@ snowModel.preRender = function(delta)
    for _, v in pairs(snowLayersToRender) do
       v.model:scale(1, math.lerp(v.oldScale, v.scale, delta), 1)
    end
-   snowLayersToRender = {}
 end
 
 return mod
