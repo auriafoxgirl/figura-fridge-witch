@@ -7,6 +7,8 @@ local scaleOffset = vec(0.001, 1, 0.001)
 
 local snowLayersToRender = {}
 
+local lerp = math.lerp
+
 function mod.newLayer(pos, time)
    pos = pos:copy():floor()
    local id = tostring(pos)
@@ -55,8 +57,8 @@ function events.tick()
          snowLayers[i] = nil
       else
          v.oldScale = v.scale
-         v.targetScale = math.lerp(v.targetScale, v.time > 20 and 1 or 0, 0.1)
-         v.scale = math.lerp(v.scale, v.targetScale, 0.2)
+         v.targetScale = lerp(v.targetScale, v.time > 20 and 1 or 0, 0.1)
+         v.scale = lerp(v.scale, v.targetScale, 0.2)
          if v.scale < 0.99 or v.targetScale < 0.99 then
             snowLayersToRender[i] = v
          end
@@ -66,7 +68,7 @@ end
 
 snowModel.preRender = function(delta)
    for _, v in pairs(snowLayersToRender) do
-      v.model:scale(1, math.lerp(v.oldScale, v.scale, delta), 1)
+      v.model:scale(1, lerp(v.oldScale, v.scale, delta), 1)
    end
 end
 

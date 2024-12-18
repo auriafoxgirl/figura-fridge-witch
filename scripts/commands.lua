@@ -1,9 +1,9 @@
 local mod = {}
 
-local iceBlocks = require('scripts.iceBlocks')
+local iceBlocks = require('scripts.ice_blocks')
 
 local function canRunCommands()
-   return player:getPermissionLevel() >= 2
+   return host:isHost() and player:getPermissionLevel() >= 2
 end
 
 local function sendCommand(command)
@@ -48,6 +48,18 @@ function mod.snowball(pos, vel)
       return
    end
    sendCommand('summon snowball '..formatPos(pos)..' {Motion:['..formatMotion(vel)..']}')
+end
+
+---@overload fun(entity: Entity, damage: number)
+function mod.spikeDamage(entity, damage)
+   if not canRunCommands() then
+      return
+   end
+   local id = entity:getType()
+   if not entity:isLiving() and id ~= 'minecraft:boat' and not id:match('minecart') then
+      return
+   end
+   sendCommand('damage '..entity:getUUID()..' '..formatNumber(damage)..' minecraft:player_attack by @s')
 end
 
 return mod

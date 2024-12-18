@@ -1,5 +1,5 @@
 local spell = {
-   icon = 'minecraft:ice',
+   icon = 'minecraft:packed_ice',
    name = 'Freeze',
 }
 

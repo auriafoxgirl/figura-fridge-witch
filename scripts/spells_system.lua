@@ -13,8 +13,9 @@ do
    local spellNames = {}
    for _, script in pairs(listFiles('scripts.spells')) do
       local spell = require(script)
-      spellsByName[spell.name] = spell
-      table.insert(spellNames, spell.name)
+      local name = (spell.actionWheelOrder or '') .. spell.name
+      spellsByName[name] = spell
+      table.insert(spellNames, name)
    end 
    table.sort(spellNames)
    for _, name in pairs(spellNames) do
