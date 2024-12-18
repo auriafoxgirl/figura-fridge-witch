@@ -2,6 +2,7 @@ local sync = require('scripts.sync')
 local itemsContainerBase = fridgeModel.itemsContainer
 local itemsContainer = itemsContainerBase:newPart('')
 local getFridgeItems
+local previousFridgeItems = ''
 local itemPositions = {
    vec(-3, 25, -2),
    vec(2.5, 25, 2),
@@ -17,8 +18,9 @@ local characterMap = {
    C = '.',
    D = '/',
    E = ':',
-   Z = ';',
-   Y = ''
+   Z = ';', -- next item
+   Y = '',  -- empty, to make sure the data wont get weird at end
+   X = '@', -- player head
 }
 local characterMapReversed = {}
 for i, v in pairs(characterMap) do
@@ -26,6 +28,10 @@ for i, v in pairs(characterMap) do
 end
 
 local function setFridgeItems(compressed)
+   if previousFridgeItems == compressed then
+      return
+   end
+   previousFridgeItems = compressed
    -- decode base64
    local buffer = data:createBuffer()
    buffer:writeByteArray(compressed)
@@ -39,6 +45,9 @@ local function setFridgeItems(compressed)
    itemsContainerBase:removeChild(itemsContainer)
    itemsContainer = itemsContainerBase:newPart('')
    for itemStr in text:gmatch('[^;]+') do
+      if itemStr:sub(1, 1) == '@' then
+         itemStr = 'minecraft:player_head{SkullOwner:' .. itemStr:sub(2, -1) .. '}'
+      end
       local success, item = pcall(world.newItem, itemStr)
       if success then
          i = i + 1
@@ -91,6 +100,37 @@ local function getFoodScore(item)
    return 1
 end
 
+local function simplifyItem(itemStr)
+   local itemId = world.newItem(itemStr).id
+   if itemId == 'minecraft:player_head' then
+      -- for some reason item.tag doesnt include the profile data?
+      local success, tag = pcall(parseJson, itemStr:match('%b{}$'))
+      if success then
+         local owner
+         if type(tag) == 'table' then
+            if type(tag.SkullOwner) == 'table' and type(tag.SkullOwner.Name) == 'string' then
+               owner = tag.SkullOwner.Name
+            elseif type(tag['minecraft:profile']) == 'table' and type(tag['minecraft:profile'].name) == 'string' then
+               owner = tag['minecraft:profile'].name
+            end
+         end
+         if owner then
+            owner = owner:lower()
+            
+            local item = '@'..owner
+            item = item:gsub('.', characterMapReversed)
+
+            return item
+         end
+      end
+   end
+
+   itemId = itemId:gsub('^minecraft:', '')
+   itemId = itemId:gsub('.', characterMapReversed)
+
+   return itemId
+end
+
 function getFridgeItems()
    local limit = #itemPositions
    -- get inventory
@@ -99,7 +139,7 @@ function getFridgeItems()
       local item = host:getSlot(i)
       local score = getFoodScore(item)
       if score >= 1 then
-         inventory[item.id] = getFoodScore(item)
+         inventory[item:toStackString()] = getFoodScore(item)
       end
    end
    -- sort items
@@ -129,9 +169,9 @@ function getFridgeItems()
    -- compress
    local tbl = {}
    for _, item in pairs(items) do
-      item = item:gsub('^minecraft:', '')
-      item = item:gsub('.', characterMapReversed)
-      table.insert(tbl, item)
+      local itemStr = simplifyItem(item)
+      itemStr = itemStr:gsub('[^%w+/]', '')
+      table.insert(tbl, itemStr)
    end
    local str = table.concat(tbl, 'Z')
    -- while a bit weird, making it act like it was base64 makes it 25% smaller

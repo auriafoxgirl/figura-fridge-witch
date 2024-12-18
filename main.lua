@@ -47,6 +47,7 @@ local itemNamesMap = {
    itemBread = 'minecraft:bread',
    itemCake = 'minecraft:cake',
    itemMilk = 'minecraft:milk_bucket',
+   itemIcecream = 'minecraft:snowball'
 }
 for _, v in pairs(models.fridge.items:getChildren()) do
    v:remove()
