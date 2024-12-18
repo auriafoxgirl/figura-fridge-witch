@@ -1,0 +1,1 @@
+Files here (assets folder) are not used in avatar itself 
