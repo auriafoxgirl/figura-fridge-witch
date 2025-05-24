@@ -101,7 +101,8 @@ local function getFoodScore(item)
 end
 
 local function simplifyItem(itemStr)
-   local itemId = world.newItem(itemStr).id
+   local success, itemStack = pcall(world.newItem, itemStr)
+   local itemId = success and itemStack.id or itemStr:match('^[-_.%w/:]*')
    if itemId == 'minecraft:player_head' then
       -- for some reason item.tag doesnt include the profile data?
       local success, tag = pcall(parseJson, itemStr:match('%b{}$'))
